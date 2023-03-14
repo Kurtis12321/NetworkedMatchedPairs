@@ -1,0 +1,8 @@
+﻿  main.cpp
+C:\Users\30036965\source\repos\MatchingPairs\MatchingPairs\main.cpp(6,1): warning C4326: return type of 'main' should be 'int' instead of 'void'
+C:\Users\30036965\source\repos\MatchingPairs\MatchingPairs\main.cpp(8,12): warning C4244: 'argument': conversion from 'time_t' to 'unsigned int', possible loss of data
+C:\Users\30036965\source\repos\MatchingPairs\MatchingPairs\main.cpp(23,9): warning C4476: 'printf' : unknown type field character '^' in format specifier
+C:\Users\30036965\source\repos\MatchingPairs\MatchingPairs\main.cpp(11,2): error C4996: 'scanf': This function or variable may be unsafe. Consider using scanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+C:\Users\30036965\source\repos\MatchingPairs\MatchingPairs\main.cpp(65,4): error C4996: 'scanf': This function or variable may be unsafe. Consider using scanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+C:\Users\30036965\source\repos\MatchingPairs\MatchingPairs\main.cpp(67,4): error C4996: 'scanf': This function or variable may be unsafe. Consider using scanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+C:\Users\30036965\source\repos\MatchingPairs\MatchingPairs\main.cpp(141,3): error C4996: 'scanf': This function or variable may be unsafe. Consider using scanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.

@@ -1,0 +1,5 @@
+﻿  main.cpp
+C:\Users\30036965\source\repos\MatchingPairs\MatchingPairs\main.cpp(6,1): warning C4326: return type of 'main' should be 'int' instead of 'void'
+C:\Users\30036965\source\repos\MatchingPairs\MatchingPairs\main.cpp(8,12): warning C4244: 'argument': conversion from 'time_t' to 'unsigned int', possible loss of data
+C:\Users\30036965\source\repos\MatchingPairs\MatchingPairs\main.cpp(23,9): warning C4476: 'printf' : unknown type field character '^' in format specifier
+  MatchingPairs.vcxproj -> C:\Users\30036965\source\repos\MatchingPairs\Debug\MatchingPairs.exe
