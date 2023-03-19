@@ -1,55 +1,84 @@
 #include <iostream>
-#include <sys/socket.h>
-#include <arpa/inet.h>
-#include <unistd.h>
-#include <string.h>
+#include <winsock2.h>
+#include <ws2tcpip.h>
+
+#pragma comment(lib, "ws2_32.lib")
 
 int main() {
-    int server_fd, new_socket, valread;
-    struct sockaddr_in address;
-    int opt = 1;
-    int addrlen = sizeof(address);
-    char buffer[1024] = { 0 };
-    const char* hello = "Hello from server";
-
-    // Creating socket file descriptor
-    if ((server_fd = socket(AF_INET, SOCK_STREAM, 0)) == 0) {
-        std::cerr << "socket failed" << std::endl;
-        return -1;
+    WSADATA wsaData;
+    int iResult = WSAStartup(MAKEWORD(2, 2), &wsaData);
+    if (iResult != 0) {
+        std::cerr << "WSAStartup failed: " << iResult << '\n';
+        return 1;
     }
 
-    // Attach socket to port 8080
-    if (setsockopt(server_fd, SOL_SOCKET, SO_REUSEADDR | SO_REUSEPORT, &opt, sizeof(opt))) {
-        std::cerr << "setsockopt failed" << std::endl;
-        return -1;
-    }
-    address.sin_family = AF_INET;
-    address.sin_addr.s_addr = INADDR_ANY;
-    address.sin_port = htons(8080);
+    addrinfo hints = {0};
+    hints.ai_family = AF_INET;
+    hints.ai_socktype = SOCK_STREAM;
+    hints.ai_protocol = IPPROTO_TCP;
+    hints.ai_flags = AI_PASSIVE;
 
-    // Bind socket to address
-    if (bind(server_fd, (struct sockaddr*)&address, sizeof(address)) < 0) {
-        std::cerr << "bind failed" << std::endl;
-        return -1;
-    }
-
-    // Listen for incoming connections
-    if (listen(server_fd, 3) < 0) {
-        std::cerr << "listen failed" << std::endl;
-        return -1;
+    addrinfo* result = nullptr;
+    iResult = getaddrinfo(nullptr, "12345", &hints, &result);
+    if (iResult != 0) {
+        std::cerr << "getaddrinfo failed: " << iResult << '\n';
+        WSACleanup();
+        return 1;
     }
 
-    // Accept incoming connection
-    if ((new_socket = accept(server_fd, (struct sockaddr*)&address, (socklen_t*)&addrlen)) < 0) {
-        std::cerr << "accept failed" << std::endl;
-        return -1;
+    SOCKET listenSocket = socket(result->ai_family, result->ai_socktype, result->ai_protocol);
+    if (listenSocket == INVALID_SOCKET) {
+        std::cerr << "socket failed: " << WSAGetLastError() << '\n';
+        freeaddrinfo(result);
+        WSACleanup();
+        return 1;
     }
 
-    // Send message to client
-    send(new_socket, hello, strlen(hello), 0);
-    std::cout << "Hello message sent" << std::endl;
+    iResult = bind(listenSocket, result->ai_addr, static_cast<int>(result->ai_addrlen));
+    if (iResult == SOCKET_ERROR) {
+        std::cerr << "bind failed: " << WSAGetLastError() << '\n';
+        freeaddrinfo(result);
+        closesocket(listenSocket);
+        WSACleanup();
+        return 1;
+    }
 
-    // Close the socket
-    close(server_fd);
+    freeaddrinfo(result);
+
+    iResult = listen(listenSocket, SOMAXCONN);
+    if (iResult == SOCKET_ERROR) {
+        std::cerr << "listen failed: " << WSAGetLastError() << '\n';
+        closesocket(listenSocket);
+        WSACleanup();
+        return 1;
+    }
+
+    SOCKET clientSocket = accept(listenSocket, nullptr, nullptr);
+    if (clientSocket == INVALID_SOCKET) {
+        std::cerr << "accept failed: " << WSAGetLastError() << '\n';
+        closesocket(listenSocket);
+        WSACleanup();
+        return 1;
+    }
+
+    closesocket(listenSocket);
+
+    char recvbuf[512] = {0};
+    int recvbuflen = 512;
+
+    iResult = recv(clientSocket, recvbuf, recvbuflen, 0);
+    if (iResult > 0) {
+        std::cout << "Received: " << recvbuf << '\n';
+    } else {
+        std::cerr << "recv failed: " << WSAGetLastError() << '\n';
+    }
+
+    iResult = shutdown(clientSocket, SD_SEND);
+    if (iResult == SOCKET_ERROR) {
+        std::cerr << "shutdown failed: " << WSAGetLastError() << '\n';
+    }
+
+    closesocket(clientSocket);
+    WSACleanup();
     return 0;
 }
